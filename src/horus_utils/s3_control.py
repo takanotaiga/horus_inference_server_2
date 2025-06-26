@@ -2,10 +2,9 @@ import boto3
 from botocore.client import Config
 from pathlib import Path
 
-MINIO_ENDPOINT = "http://192.168.1.14:65300"
+MINIO_ENDPOINT = "http://object-storage:9000"
 ACCESS_KEY = "minioadmin"
 SECRET_KEY = "minioadmin"
-
 
 class S3Controller:
     def __init__(self):

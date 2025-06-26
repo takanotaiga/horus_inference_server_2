@@ -38,7 +38,7 @@ class FFmpegActions:
             return type.FFmpegResult.UNKNOWN_ERROR
         
     def system_check(self):
-        TEST_RESOURCE_FOLDER = "/workspace/horus_inference_server/test_resource"
+        TEST_RESOURCE_FOLDER = "/workspace/resourcere"
         TEST_VIDEO_FILES = [
             os.path.join(TEST_RESOURCE_FOLDER, "sample_av1.mp4"),
             os.path.join(TEST_RESOURCE_FOLDER, "sample_h264.mp4"),

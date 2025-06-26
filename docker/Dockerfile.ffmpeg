@@ -60,3 +60,7 @@ RUN apt-get autoremove -y \
  && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install fastapi uvicorn requests boto3
+
+COPY ../src /workspace/src
+COPY ../test_resource  /workspace/resourcere
+WORKDIR /workspace/src
