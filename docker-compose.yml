@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  object-storage:
+    image: quay.io/minio/minio
+    ports:
+      - "65300:9000"
+      - "65301:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ./miniio_data:/data
+    command: server /data --console-address ":9001"
+
+  horus-ffmpeg-server:
+      build:
+        context: .
+        dockerfile: docker/Dockerfile.ffmpeg
+      image: horus_ffmpeg_server:latest
+      depends_on:
+        - object-storage 
+      ports:
+        - "65302:8000"
+      deploy:
+        resources:
+          reservations:
+            devices:
+              - driver: nvidia
+                count: 1
+                capabilities: [gpu, video]
+      command: uvicorn ffmpeg_server:app --host 0.0.0.0 --port 8000
