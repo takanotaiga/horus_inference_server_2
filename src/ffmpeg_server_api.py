@@ -1,8 +1,7 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from pydantic import BaseModel, HttpUrl
 import requests, os
-
-from ffmpeg_server_utils import actions, type
+from ffmpeg_server import actions, type
 from horus_utils import s3_control, uuid_tools
 
 app = FastAPI()

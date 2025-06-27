@@ -1,4 +1,4 @@
-from ffmpeg_server_utils import type
+from ffmpeg_server import type
 
 def print_ffmpeg_result(code: type.FFmpegResult):
     match code:
