@@ -59,7 +59,11 @@ RUN apt-get autoremove -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m pip install fastapi uvicorn requests boto3
+RUN python3 -m pip install \
+  fastapi==0.115.13 \
+  uvicorn==0.34.3 \
+  requests==2.32.4 \
+  boto3==1.38.44
 
 COPY ../src /workspace/src
 COPY ../test_resource  /workspace/resourcere
