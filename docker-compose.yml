@@ -13,6 +13,15 @@ services:
       - ./miniio_data:/data
     command: server /data --console-address ":9001"
 
+  database:
+    image: surrealdb/surrealdb:latest
+    ports:
+      - "65303:8000"
+    user: "1000"
+    volumes:
+      - ./database:/horus_database
+    command: start --user root --pass root rocksdb:/horus_database/horus_database.db
+
   horus-ffmpeg-server:
       build:
         context: .
