@@ -2,3 +2,10 @@ __pycache__
 miniio_data
 env
 database
+output
+*.engine
+*.onnx
+*.pth
+*.jpeg
+*.jpg
+*.png
