@@ -29,6 +29,7 @@ services:
       image: horus_ffmpeg_server:latest
       depends_on:
         - object-storage 
+        - database
       ports:
         - "65302:8000"
       deploy:
@@ -38,4 +39,20 @@ services:
               - driver: nvidia
                 count: 1
                 capabilities: [gpu, video]
-      command: uvicorn ffmpeg_server:app --host 0.0.0.0 --port 8000
+      command: uvicorn ffmpeg_server_api:app --host 0.0.0.0 --port 8000
+
+  horus-backend-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    image: horus_backend_server:latest
+    depends_on:
+      - object-storage 
+      - database
+    ports:
+      - "65304:8000"
+    volumes:
+      - ./src:/workspace/src
+    command: /bin/bash -c "while true; do sleep 1000; done"
+    stdin_open: true
+    tty: true
