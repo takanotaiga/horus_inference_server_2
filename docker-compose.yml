@@ -41,7 +41,7 @@ services:
                 capabilities: [gpu, video]
       command: uvicorn ffmpeg_server_api:app --host 0.0.0.0 --port 8000
 
-  horus-backend-server:
+  horus-backend-api-server:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
@@ -52,7 +52,7 @@ services:
     ports:
       - "65304:8000"
     volumes:
-      - ./src:/workspace/src
-    command: /bin/bash -c "while true; do sleep 1000; done"
+      - ./src:/workspace
+    command: uvicorn backend_api:app --host 0.0.0.0 --port 8000
     stdin_open: true
     tty: true

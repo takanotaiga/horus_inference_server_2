@@ -1,8 +1,10 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from pydantic import BaseModel, HttpUrl
-import requests, os
+import requests, os, json
 from ffmpeg_server import actions, type
-from horus_utils import s3_control, uuid_tools
+from horus_utils import s3_control, uuid_tools, s3_client
+
+BACKEND_API_SERVER_URL = "http://horus-backend-api-server:8000"
 
 app = FastAPI()
 ffmpeg_action = actions.FFmpegActions()
@@ -11,21 +13,28 @@ s3 = s3_control.S3Controller()
 class EncodeRequest(BaseModel):
     fileurl: str
     codec: str
-    callback_url: HttpUrl
+    fileid: str
 
 class EncodeResponse(BaseModel):
     job_id: str
 
 jobs: dict[str, str] = {}
 
-def _post_result(cb_url: str, job_id: str, result: type.FFmpegResult):
+def _post_result(file_id: str):
     try:
-        requests.post(cb_url, json={
-            "job_id": job_id,
-            "status": result.name,
-        }, timeout=10)
+        data = {
+            "file_id": file_id,
+            "action": "FFMPEG"
+        }
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(f"{BACKEND_API_SERVER_URL}/preprocess_status/update", data=json.dumps(data), headers=headers)
+        print(response)
     except Exception as e:
-        print(f"[CallbackError] {cb_url=} {e=}")
+        print(f"[CallbackError] {e=}")
 
 def _encode_job(job_id: str, req: EncodeRequest):
     result = type.FFmpegResult.UNKNOWN_ERROR
@@ -57,14 +66,20 @@ def _encode_job(job_id: str, req: EncodeRequest):
         if os.path.exists(local_in): os.remove(local_in)
 
     try:
-        s3.upload(local_out)
+        s3_client.upload_file(
+            file_path=local_out,
+            parent=req.fileid,
+            hierarchy="encoded_video"
+        )
         if os.path.exists(local_out): os.remove(local_out)
+        _post_result(req.fileid)
         jobs[job_id] = "ALL_TASK_DONE"
+        
     except Exception as e:
         print("[UnknownError]", e)
         jobs[job_id] = "FAILED_S3_ERROR"
 
-@app.post("/encoder/encode_action", response_model=EncodeResponse)
+@app.post("/encoder/encode_action")
 def encode_action(req: EncodeRequest, background_tasks: BackgroundTasks):
     job_id = uuid_tools.get_uuid()
     jobs[job_id] = "RUNNING"

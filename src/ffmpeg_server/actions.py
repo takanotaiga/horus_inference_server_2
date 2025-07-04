@@ -3,12 +3,14 @@ from ffmpeg_server import util
 import subprocess, os
 import tempfile
 import re
+import threading
 
 class FFmpegActions:
     encoder_support_list = {}
 
     def __init__(self):
         self.system_check()
+        self._db_lock = threading.Lock()
         print("Start FFmpegActions")
 
     def ffmpeg_runner_action(self, command: list[str]) -> type.FFmpegResult:
@@ -86,16 +88,17 @@ class FFmpegActions:
         if not os.access(out_dir, os.W_OK):
             return type.FFmpegResult.OUTPUT_NOT_WRITABLE
         
-        codec = re.sub(r'[^a-zA-Z0-9]', '', codec).lower()        
-        match codec:
-            case "av1":
-                return self.encode_backend_av1_nvenc(input_file, output_file)
-            case "h264":
-                return self.encode_backend_av1_nvenc(input_file, output_file)
-            case "h265":
-                return self.encode_backend_av1_nvenc(input_file, output_file)
-            case _:
-                return type.FFmpegResult.UNKNOWN_ERROR
+        codec = re.sub(r'[^a-zA-Z0-9]', '', codec).lower()
+        with self._db_lock:       
+            match codec:
+                case "av1":
+                    return self.encode_backend_av1_nvenc(input_file, output_file)
+                case "h264":
+                    return self.encode_backend_av1_nvenc(input_file, output_file)
+                case "h265":
+                    return self.encode_backend_av1_nvenc(input_file, output_file)
+                case _:
+                    return type.FFmpegResult.UNKNOWN_ERROR
 
     def encode_backend_av1_nvenc(self, inp: str, out: str) -> type.FFmpegResult:
         if self.encoder_support_list[type.EncoderName.AV1_NVENC]:

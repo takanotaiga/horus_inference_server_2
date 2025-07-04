@@ -19,6 +19,7 @@ class S3Info(IntEnum):
     UPLOAD_FAILED = auto()
     DOWNLOAD_FAILED = auto()
     DELETE_FAILED = auto()
+    GET_URL_FAILED = auto()
 
 class CompleteUploadRequest(BaseModel):
     key: str
@@ -57,7 +58,7 @@ class S3Controller:
             return S3Info.FILE_NOT_FOUND
 
     def upload(self, file_path: str, save_folder: str) -> Tuple[S3Info, str]:
-        save_path = os.path.join(save_folder, uuid_tools.get_uuid(8) + "-" + Path(file_path).name)
+        save_path = os.path.join(save_folder, uuid_tools.get_uuid(16) + "-" + Path(file_path).name)
         try:
             with open(file_path, "rb") as f:
                 self.s3.upload_fileobj(f, HORUS_SEVER_BUCKET, save_path)
@@ -66,14 +67,13 @@ class S3Controller:
             return S3Info.UPLOAD_FAILED, "Upload failed: " + str(e)
         
     def get_multipart_upload_id(self, file_path: str, save_folder: str, content_type: str) -> Tuple[S3Info, str, str]:
-        save_path = os.path.join(save_folder, uuid_tools.get_uuid(8) + "-" + Path(file_path).name)
+        save_path = os.path.join(save_folder, uuid_tools.get_uuid(16) + "-" + Path(file_path).name)
         try:
            resp = self.s3.create_multipart_upload(
                 Bucket=HORUS_SEVER_BUCKET,
                 Key=save_path,
                 ContentType=content_type,
             )
-           print(save_path, ", " , resp["UploadId"])
            return S3Info.SUCCESS, save_path, resp["UploadId"]
         except Exception as e:
             print(e)
@@ -88,7 +88,6 @@ class S3Controller:
                     PartNumber=part_number,
                     Body=data,
                 )
-            print(resp["ETag"])
             return S3Info.SUCCESS, resp["ETag"]
         except Exception as e:
             print(e)
@@ -129,4 +128,17 @@ class S3Controller:
         except Exception as e:
             return S3Info.DELETE_FAILED
         
-   
+    def generate_presigned_url(self, s3_path: str, expiration_sec: int = 3600) -> Tuple[S3Info, str]:
+        try:
+            url = self.s3.generate_presigned_url(
+                ClientMethod='get_object',
+                Params={
+                    'Bucket': HORUS_SEVER_BUCKET,
+                    'Key': s3_path
+                },
+                ExpiresIn=expiration_sec
+            )
+            return S3Info.SUCCESS, url
+        except Exception as e:
+            return S3Info.GET_URL_FAILED, f"Failed to generate presigned URL: {e}"
+

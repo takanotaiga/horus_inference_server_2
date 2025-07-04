@@ -1,1 +1,12 @@
 # horus_inference_server_2
+
+
+## File Upload State
+```mermaid
+flowchart TB
+    UPLOADING --> UPLOAD_COMPLETE
+    UPLOAD_COMPLETE --動画--> VIDEO_ENCODE_AV1_READY
+    VIDEO_ENCODE_AV1_READY --> VIDEO_ENCODE_AV1_WIP
+    VIDEO_ENCODE_AV1_WIP --> VIDEO_ENCODE_AV1_COMPLETE
+
+```
