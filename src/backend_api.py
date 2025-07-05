@@ -1,5 +1,5 @@
 from horus_utils import s3_control
-from backend import backend_manager, user_registry, file_preprocess
+from backend import backend_manager, file_preprocess
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 

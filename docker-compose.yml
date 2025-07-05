@@ -56,3 +56,19 @@ services:
     command: uvicorn backend_api:app --host 0.0.0.0 --port 8000
     stdin_open: true
     tty: true
+
+  horus-cv-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.opencv
+    image: horus_cv_server:latest
+    depends_on:
+      - object-storage 
+      - database
+    ports:
+      - "65305:8000"
+    volumes:
+      - ./src:/workspace
+    command: uvicorn cv_api:app --host 0.0.0.0 --port 8000
+    stdin_open: true
+    tty: true

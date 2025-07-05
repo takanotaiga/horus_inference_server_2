@@ -106,7 +106,7 @@ class FFmpegActions:
                 "ffmpeg", "-y", "-nostdin",
                 "-i", inp, "-an",
                 "-c:v", "av1_nvenc", "-preset", "p1", "-tune", "ull",
-                "-b:v", "3000k",
+                "-b:v", "6000k",
                 out
             ]
             return self.ffmpeg_runner_action(cmd)
@@ -119,7 +119,7 @@ class FFmpegActions:
                 "ffmpeg", "-y", "-nostdin",
                 "-i", inp, "-an",
                 "-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ull",
-                "-b:v", "6000k",
+                "-b:v", "12000k",
                 out
             ]
             return self.ffmpeg_runner_action(cmd)
@@ -132,7 +132,7 @@ class FFmpegActions:
                 "ffmpeg", "-y", "-nostdin",
                 "-i", inp, "-an",
                 "-c:v", "hevc_nvenc", "-preset", "p1", "-tune", "ull",
-                "-b:v", "3000k",
+                "-b:v", "6000k",
                 out
             ]
             return self.ffmpeg_runner_action(cmd)

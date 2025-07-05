@@ -3,15 +3,22 @@ from uuid import uuid4, UUID
 from horus_utils import state_transition
 import threading
 from datetime import datetime
-
+import time
 
 USER_REGISTRY_DB_URL = "ws://database:8000/rpc"
 
 class BackendManager:
     def __init__(self):
         self.object_storage_db = Surreal(USER_REGISTRY_DB_URL)
-        self.object_storage_db.signin({"username": 'root', "password": 'root'})
-        self.object_storage_db.use("dataset_collection", "object-storage-index")
+        for _ in range(5):
+            try:
+                self.object_storage_db.signin({"username":"root", "password":"root"})
+                self.object_storage_db.use("dataset_collection", "object-storage-index")
+                break
+            except ConnectionRefusedError:
+                time.sleep(1)
+        else:
+            raise RuntimeError("SurrealDB に接続できませんでした")
         self._db_lock = threading.Lock()
 
     def uploadFileInit(self, folder: str, filename: str, upload_id: str, s3_path: str, parent: str, hierarchy: str):
