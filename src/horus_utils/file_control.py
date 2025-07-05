@@ -15,7 +15,8 @@ def remove_file(input: str) -> type.FileRemoveResult:
 
 def get_file_type(file_path: str) -> type.FileType:
     _, file_extension = os.path.splitext(file_path)
-    file_extension = re.sub(r'[^a-zA-Z]', '', file_extension).lower()
+    file_extension = re.sub(r'[^a-zA-Z0-9]', '', file_extension).lower()
+    print(file_extension)
 
     video_extensions = [
         "mp4",

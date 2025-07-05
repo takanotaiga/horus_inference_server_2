@@ -21,7 +21,9 @@ class BackendManager:
             raise RuntimeError("SurrealDB に接続できませんでした")
         self._db_lock = threading.Lock()
 
-    def uploadFileInit(self, folder: str, filename: str, upload_id: str, s3_path: str, parent: str, hierarchy: str):
+    def uploadFileInit(self, folder: str, filename: str, upload_id: str, s3_path: str, parent: UUID, hierarchy: str):
+        if type(parent) != UUID and parent != "root":
+            parent = UUID(parent)
         file_id = uuid4()
         with self._db_lock:
             self.object_storage_db.create(
