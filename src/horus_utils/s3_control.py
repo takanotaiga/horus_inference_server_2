@@ -8,7 +8,6 @@ from typing import Tuple, List
 from pydantic import BaseModel
 
 
-MINIO_ENDPOINT = "http://object-storage:9000"
 ACCESS_KEY = "minioadmin"
 SECRET_KEY = "minioadmin"
 HORUS_SEVER_BUCKET = "horus-inference-server"
@@ -28,7 +27,12 @@ class CompleteUploadRequest(BaseModel):
 
 
 class S3Controller:
-    def __init__(self):
+    def __init__(self, internal_mode = True):
+        if not internal_mode:
+            MINIO_ENDPOINT = "http://dpc2500015.local:65300"
+        else:
+            MINIO_ENDPOINT = "http://object-storage:9000"
+
         self.s3 = boto3.client(
             "s3",
             endpoint_url=MINIO_ENDPOINT,

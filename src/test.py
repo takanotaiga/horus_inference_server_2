@@ -1,21 +1,4 @@
-from backend import backend_manager
+from horus_utils import s3_control
 
-bm = backend_manager.BackendManager()
-
-# print(bm.get_folder_list())
-
-# print(bm.get_file_list())
-
-# print(bm.get_preprocess_status("863d0545-55cd-48a7-aef6-7011c2de804f"))
-
-from uuid import uuid4, UUID
-
-# file_id = UUID("863d0545-55cd-48a7-aef6-7011c2de804f")
-file_id = "863d0545-55cd-48a7-aef6-7011c2de804f"
-
-upload_id = "YjMwYTA1OGMtNzc1NS00YTgzLTg0NWEtZDA4NGJmZGQ3N2ZkLjljYWQzZDliLTBmMDctNGRjNC04MWNlLWU3NTFhMWEwMzlmYXgxNzUxNjI3MjIzMDc1MTI0OTI1"
-
-# print(bm.get_file_id(upload_id))
-
-print(bm.get_preprocess_status(file_id))
-print(bm.get_parent(file_id))
+s3 = s3_control.S3Controller(internal_mode=False)
+print(s3.generate_presigned_url("user-data/7cd47bff2b0a4054-0389eea1ba474643826192f06f583230.png"))

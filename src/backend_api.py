@@ -90,3 +90,7 @@ def get_upload_status():
 @app.get("/storage/folder_list")
 def get_folder_list():
     return {"files": backend.get_folder_list()} 
+
+@app.get("/storage/folder_content")
+def get_folder_content(folder_name: str):
+    return {"files": backend.get_folder_content(folder_name)}
